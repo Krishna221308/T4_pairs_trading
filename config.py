@@ -8,4 +8,4 @@ START_DATE = "2019-01-01"
 END_DATE = "2024-06-01"
 
 # Cointegration significance threshold
-COINT_ALPHA = 0.05
+COINT_ALPHA = 0.10

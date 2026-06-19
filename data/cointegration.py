@@ -28,7 +28,7 @@ def test_pairs(pairs: list[tuple], price_df: pd.DataFrame, alpha=0.05) -> pd.Dat
         x_with_const = sm.add_constant(x)
         ols_model = sm.OLS(y, x_with_const).fit()
         alpha_ols = ols_model.params['const']
-        beta_ols = ols.model.params[ticker2]
+        beta_ols = ols_model.params[ticker2]
 
         pair_id = f"{ticker1}_{ticker2}"
 
