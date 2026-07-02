@@ -33,7 +33,7 @@ def half_life(spread: pd.Series) -> float:
         return np.nan
     
     # Half-life formula
-    return -np.ln(2)/lambda_param
+    return -np.log(2)/lambda_param
 
 
 def test_pairs(pairs: list[tuple], price_df: pd.DataFrame, alpha=0.05) -> pd.DataFrame:
