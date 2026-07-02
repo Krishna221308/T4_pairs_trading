@@ -1,7 +1,40 @@
+import numpy as np
+import config
 import pandas as pd
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import coint
 import os
+
+def half_life(spread: pd.Series) -> float:
+    """
+        Calculate the half life of a mean reversion for a spread
+        Fits an AR(1) model: change in spread = a*spread_{t-1} + ephsilon
+        Returns the half life in days. 
+        Returns NaN if it doesn't exist.
+    """
+    
+    # Calculate day to day changes in the spread.
+    spread_diff = spread.diff().dropna()
+
+    # We need the previous day's spread aligned with today's change
+    spread_lagged = spread.shift(1).dropna()
+
+    # Align the two series
+    spread_diff = spread_diff.loc[spread_lagged.index]
+
+    if len(spread_diff) == 0:
+        return np.nan
+    
+    # Run OLS Regression without an intercept using statsmodel OLS
+    model = sm.OLS(spread_diff, spread_lagged).fit()
+    lambda_param = model.params.iloc[0]
+
+    if lambda_param >= 0:
+        return np.nan
+    
+    # Half-life formula
+    return -np.ln(2)/lambda_param
+
 
 def test_pairs(pairs: list[tuple], price_df: pd.DataFrame, alpha=0.05) -> pd.DataFrame:
     """
@@ -22,13 +55,20 @@ def test_pairs(pairs: list[tuple], price_df: pd.DataFrame, alpha=0.05) -> pd.Dat
 
         # Engle-Granger Cointegration Test (Augmented Dickey-Fuller on residuals) 
         score, p_value, _ = coint(y,x)
-        is_cointegrated = p_value < alpha
 
         # OLS Regression to capture initial hedge ratio parameters
         x_with_const = sm.add_constant(x)
         ols_model = sm.OLS(y, x_with_const).fit()
         alpha_ols = ols_model.params['const']
         beta_ols = ols_model.params[ticker2]
+
+        # Calculate the historical spread
+        spread = y - (alpha_ols + beta_ols * x)
+
+        # Using half-life 
+        hl = half_life(spread)
+
+        is_cointegrated = ((p_value < alpha) and (pd.notna(hl)) and (config.HALF_LIFE_MIN <= hl) and (config.HALF_LIFE_MAX >= hl))
 
         pair_id = f"{ticker1}_{ticker2}"
 
@@ -39,6 +79,7 @@ def test_pairs(pairs: list[tuple], price_df: pd.DataFrame, alpha=0.05) -> pd.Dat
             'p_value': p_value,
             'beta_ols': beta_ols,
             'alpha_ols': alpha_ols,
+            'half-life': hl,
             'cointegrated': is_cointegrated
         })
 
