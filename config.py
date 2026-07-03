@@ -34,3 +34,6 @@ IMPACT_GAMMA = 0.5      # Market impact scaling constant
 
 # Model persistance
 MODEL_OUTPUT_DIR = "output/models"
+
+# Frequency
+FREQUENCY = 252         # Annualised returns
