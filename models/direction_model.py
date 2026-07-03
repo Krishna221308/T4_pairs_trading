@@ -28,7 +28,7 @@ def build_features(kalman_df: pd.DataFrame, price_df: pd.DataFrame, ticker_y: st
     df['mom_x'] = price_df[ticker_x].pct_change(10)
 
     # Predict spread tommorow
-    df['target_spread_return'] = df['spread'].shift(-1) - df['spread']
+    df['target_spread_returns'] = df['spread'].shift(-1) - df['spread']
 
     return df.dropna()
 
@@ -62,7 +62,7 @@ def generate_positions(model, features_df: pd.DataFrame, entry_z: float = config
     """
 
     # Get the models predictions after removing the actual values to avoid lookahead
-    X = features_df.drop(columns = ['target_spread_return'])
+    X = features_df.drop(columns = ['target_spread_returns'])
     predictions = model.predict(X)
 
     # Create a positions array

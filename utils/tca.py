@@ -68,13 +68,13 @@ def apply_tca(trades_df: pd.DataFrame, price_df: pd.DataFrame) -> pd.DataFrame:
 
     trades_df = trades_df.merge(
         price_df[['Date', 'Ticker', 'ADV', 'Daily_Vol']],
-        on=['Date', 'Ticker']
+        on=['Date', 'Ticker'],
         how='left'
     )
 
     # Calculate slippage
     trades_df['Slippage'] = trades_df.apply(
-        lambda row: slippage_cost(row['Price']*row['Size'], axis=1)
+        lambda row: slippage_cost(row['Price'])*row['Size'], axis=1
     )
 
     # Calculate Market Impact
