@@ -51,8 +51,10 @@ class StatArbSignal(BaseSignal):
                 continue
 
             # Model still works (retraining)
-            X_train = train_features.drop(columns=['target_spread_returns'])
-            y_train = train_features['target_spread_returns']
+            valid_train = train_features.dropna(subset=['target_spread_returns'])
+
+            X_train = valid_train.drop(columns=['target_spread_returns'])
+            y_train = valid_train['target_spread_returns']
 
             models = train_ridge_lasso(X_train ,y_train)
             current_model = models['ridge']

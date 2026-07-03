@@ -29,8 +29,9 @@ def build_features(kalman_df: pd.DataFrame, price_df: pd.DataFrame, ticker_y: st
 
     # Predict spread tommorow
     df['target_spread_returns'] = df['spread'].shift(-1) - df['spread']
+    features_to_check = [col for col in df.columns if col!= 'target_spread_returns']
 
-    return df.dropna()
+    return df.dropna(subset=features_to_check)
 
 def train_ridge_lasso(X_train: pd.DataFrame, y_train: pd.Series) -> dict:
     """
