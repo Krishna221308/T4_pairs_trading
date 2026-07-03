@@ -26,6 +26,7 @@ EXIT_Z = 00.5          # exit when |z| <= this
 # Walk forward params
 TRAIN_FRAC = 0.70       #70% train and 30% test (chronologically)
 REFIT_INTERVAL = 60     # Re-fit ML model every N bars
+LOOKBACK_COINT = 120    # To check for cointegration breakdown
 
 # TCA params
 SLIPPAGE_BPS = 5        # Half-spread in basis points
